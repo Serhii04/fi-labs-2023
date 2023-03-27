@@ -29,7 +29,7 @@ def main():
     #             dest="cp_2/volynets_fi-03_cp2/example_text.txt")
     
     with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
-        get_alpha(file.read())
+        pass
 
 if __name__ == "__main__":
     main()
