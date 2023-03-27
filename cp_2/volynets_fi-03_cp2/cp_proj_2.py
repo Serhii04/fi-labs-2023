@@ -82,13 +82,26 @@ class WienerCryptographer:
 
         return cipher
 
+    def count_occurrences(self, text: str) -> dict:
+        occurrences = dict()
+        for c in text:
+            if c not in occurrences:
+                occurrences[c] = 1
+            else:
+                occurrences[c] += 1
+        
+        return occurrences
+
+
+
 
 ru_alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 def main():
     John = WienerCryptographer(ru_alpha)
 
     with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
-        cipher = John.cipher(key="ключ", text=file.read())
+        text = file.read()
+        cipher = John.cipher(key="аааааааааааааааая", text=text)
         print(cipher)
 
 if __name__ == "__main__":
