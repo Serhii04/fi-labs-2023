@@ -92,17 +92,76 @@ class WienerCryptographer:
         
         return occurrences
 
+    def accordance_index(self, text: str) -> float:
+        index = 0
 
+        occurrences = self.count_occurrences(text=text)
+        for key in occurrences:
+            index += occurrences[key] * (occurrences[key] - 1)
+
+        n = len(text)
+        index = (index / n) / (n-1)
+
+        return index
+
+    def blocks_accordance_index(self, blocks: list) -> list:
+        accordances = list()
+        for block in blocks:
+            accordances.append(self.accordance_index(text=block))
+        
+        return accordances
+
+    def divide_text(self, text: str, r: int) -> list:
+        if len(text) < r:
+            raise ValueError(f'ERROR: r: "{r}" must me less then text size: "{len(text)}")')
+
+        blocks = list()
+        for i in range(r):
+            blocks.append("")
+        
+        i = 0
+        for c in text:
+            blocks[i] += c
+            i += 1
+            if i == r:
+                i = 0 
+        
+        return blocks
+
+    def calculate_key_size(self, text: str, e: int=0.01) -> int:
+        for r in range(2, 33):
+            print(r)
+            blocks = self.divide_text(text=text, r=r)
+            accordances = self.blocks_accordance_index(blocks=blocks)
+
+            # I_0 = 1 / self.size
+            # I = 0.055
+            I = self.accordance_index(text=text)
+            
+            pprint(f"{r}: {accordances} - {I}")
+            size_is_r = True
+            for accordance in accordances:
+                if abs(accordance - I) < e:
+                    size_is_r = False
+                    break
+            
+            if size_is_r:
+                return r
+
+            
 
 
 ru_alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
+
+from pprint import pprint
 def main():
     John = WienerCryptographer(ru_alpha)
 
     with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
         text = file.read()
-        cipher = John.cipher(key="аааааааааааааааая", text=text)
-        print(cipher)
+        cipher = John.cipher(key="абвгдежзийклааа", text=text)
+        
+        pprint(John.calculate_key_size(text=cipher))
 
 if __name__ == "__main__":
     main()
