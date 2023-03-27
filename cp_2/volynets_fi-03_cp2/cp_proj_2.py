@@ -1,6 +1,6 @@
 import math
 
-def create_text(sourse: str, dest: str):
+def create_text(sourse: str, dest: str) -> None:
     """Read from file sourse, convert to apropriate 
     form and write it to dest file
 
@@ -17,19 +17,31 @@ def create_text(sourse: str, dest: str):
             for c in text_read:
                 if c.isalpha():
                     file_write.write(c.lower())
-        
-ru_alpha = [
-    'а', 'б', 'в', 'г', 'д', 'е', 'ж', 'з', 'и', 'й', 'к',
-    'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'х', 'ц',
-    'ч', 'ш', 'щ', 'ы', 'ь', 'э', 'ю', 'я'
-]
 
+class WienerCryptographer:
+    def __init__(self, alpha) -> None:
+        self.set_alpha(alpha=alpha)
+
+    def set_alpha(self, alpha: list) -> None:
+        # In case if you are lasy and want to define alpha as string
+        if isinstance(alpha, str):
+            alpha = list(alpha)
+
+        self.alpha = alpha
+        self.alpha_size = len(alpha)
+
+        self.__id_to_letter = dict()
+        for id, leter in zip(range(len(alpha)), alpha):
+            self.__id_to_letter[id] = leter
+
+        self.__letter_to_id = dict()
+        for id, leter in zip(range(len(alpha)), alpha):
+            self.__letter_to_id[leter] = id
+
+
+ru_alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 def main():
-    # create_text(sourse="cp_2/volynets_fi-03_cp2/example_pre_text.txt",
-    #             dest="cp_2/volynets_fi-03_cp2/example_text.txt")
-    
-    with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
-        pass
+    John = WienerCryptographer(ru_alpha)
 
 if __name__ == "__main__":
     main()
