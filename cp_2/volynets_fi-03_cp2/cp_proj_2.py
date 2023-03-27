@@ -22,13 +22,9 @@ class WienerCryptographer:
     def __init__(self, alpha) -> None:
         self.set_alpha(alpha=alpha)
 
-    def set_alpha(self, alpha: list) -> None:
-        # In case if you are lasy and want to define alpha as string
-        if isinstance(alpha, str):
-            alpha = list(alpha)
-
+    def set_alpha(self, alpha: str) -> None:
         self.alpha = alpha
-        self.alpha_size = len(alpha)
+        self.size = len(alpha)
 
         self.__id_to_letter = dict()
         for id, leter in zip(range(len(alpha)), alpha):
@@ -37,11 +33,63 @@ class WienerCryptographer:
         self.__letter_to_id = dict()
         for id, leter in zip(range(len(alpha)), alpha):
             self.__letter_to_id[leter] = id
+    
+    def get_id(self, leter: str):
+        """
+        Retruns:
+            int: index of leter in alphabet, starting from 0
+        """
+        return self.__letter_to_id[leter]
+
+    def get_leter(self, leter_id: int):
+        """
+        Retruns:
+            str: char in alphabet at given index
+        """
+        while leter_id >= self.size:
+            leter_id -= self.size
+        
+        while leter_id < 0:
+            leter_id += self.size
+
+        return self.__id_to_letter[leter_id]
+    
+    def cipher(self, key: str, text: str) -> str:
+        """Wiener cipher
+
+        Args:
+            key (list): list of integer numbers
+            text (str): text to ciphered
+        
+        Returns:
+            str: cipher
+        """
+        key_values = list()
+        for c in key:
+            if c not in self.alpha:
+                raise ValueError(f"ERROR: key '{c}' isn't in alphabet")
+            key_values.append(self.get_id(leter=c))
+
+        cipher = ""
+
+        i = 0
+        for c in text:
+            cipher += self.get_leter(self.get_id(c) + key_values[i])
+            i += 1
+
+            if i >= len(key):
+                i = 0
+
+        return cipher
 
 
 ru_alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 def main():
     John = WienerCryptographer(ru_alpha)
+
+    with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
+        cipher = John.cipher(key="ключ", text=file.read())
+        print(cipher)
 
 if __name__ == "__main__":
     main()
