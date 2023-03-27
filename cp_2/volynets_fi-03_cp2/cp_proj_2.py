@@ -86,6 +86,34 @@ class WienerCryptographer:
 
         return cipher
 
+    def uncipher(self, key: str, text: str) -> str:
+        """Wiener uncipher
+
+        Args:
+            key (list): list of integer numbers
+            text (str): text to unciphered
+        
+        Returns:
+            str: uncipher
+        """
+        key_values = list()
+        for c in key:
+            if c not in self.alpha:
+                raise ValueError(f"ERROR: key '{c}' isn't in alphabet")
+            key_values.append(self.get_id(leter=c))
+
+        uncipher = ""
+
+        i = 0
+        for c in text:
+            uncipher += self.get_leter(self.get_id(c) - key_values[i])
+            i += 1
+
+            if i >= len(key):
+                i = 0
+
+        return uncipher
+
     def count_occurrences(self, text: str) -> dict:
         occurrences = dict()
         for c in self.alpha:
@@ -137,14 +165,16 @@ class WienerCryptographer:
             blocks = self.divide_text(text=text, r=r)
             accordances = self.blocks_accordance_index(blocks=blocks)
 
-            # I_0 = 1 / self.size
-            # I = 0.055
-            I = self.accordance_index(text=text)
-            
-            # pprint(f"{r}: {accordances} - {I}")
+            I_0 = 1 / self.size
+            I = 0.055
+            # I = self.accordance_index(text=text)
+
+            diff = (I_0 + I) / 2
+
+            pprint(f"{r}: {accordances} - {diff}")
             size_is_r = True
             for accordance in accordances:
-                if abs(accordance - I) < e:
+                if accordance - I_0 < 0.02:
                     size_is_r = False
                     break
             
@@ -237,15 +267,15 @@ def main():
     with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
         text = file.read()
         
-        cipher = John.cipher(key="абвабвабвабва", text=text)
+        cipher = John.cipher(key="абвабвабва", text=text)
 
         un_key = John.decipher_by_letter(text=cipher)
-        deciper = John.cipher(key=un_key, text=cipher)
+        deciper = John.uncipher(key=un_key, text=cipher)
         print(f"un_key 1: {un_key}")
         print(f"deciper 1: {deciper}")
 
         un_key = John.decipher_by_M_func(text=cipher)
-        deciper = John.cipher(key=un_key, text=cipher)
+        deciper = John.uncipher(key=un_key, text=cipher)
         print(f"un_key 2: {un_key}")
         print(f"deciper 2: {deciper}")
 
