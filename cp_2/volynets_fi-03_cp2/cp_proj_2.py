@@ -20,8 +20,8 @@ def create_text(sourse: str, dest: str) -> None:
                     file_write.write(c.lower())
 
 class WienerCryptographer:
-    def __init__(self, alpha: str, leters_probapility: list) -> None:
-        self.leters_probapility = leters_probapility.copy()
+    def __init__(self, alpha: str, leters_probability: list) -> None:
+        self.leters_probability = leters_probability.copy()
         self.set_alpha(alpha=alpha)
 
     def set_alpha(self, alpha: str) -> None:
@@ -161,22 +161,31 @@ class WienerCryptographer:
         return blocks
 
     def calculate_key_size(self, text: str, e: int=0.01) -> int:
-        for r in range(2, 100):
+        for r in range(2, 1000):
             blocks = self.divide_text(text=text, r=r)
             accordances = self.blocks_accordance_index(blocks=blocks)
 
             I_0 = 1 / self.size
             I = 0.055
-            # I = self.accordance_index(text=text)
+            I_text = self.accordance_index(text=text)
 
             diff = (I_0 + I) / 2
 
-            pprint(f"{r}: {accordances} - {diff}")
-            size_is_r = True
+            avarage_accordance = 0
             for accordance in accordances:
-                if accordance - I_0 < 0.02:
-                    size_is_r = False
-                    break
+                avarage_accordance += accordance
+            avarage_accordance = avarage_accordance / len(accordances)
+            # pprint(avarage_accordance)
+
+            # pprint(f"{r}: {accordances} - {diff}")
+            size_is_r = True
+            if avarage_accordance < diff:
+                size_is_r = False
+            
+            # for accordance in accordances:
+            #     if accordance < diff:
+            #         size_is_r = False
+            #         break
             
             if size_is_r:
                 return r
@@ -208,9 +217,9 @@ class WienerCryptographer:
         for g in self.alpha:
             M[g] = 0 
             for t in self.alpha:
-                M[g] += self.leters_probapility[t] * occurrences[self.get_leter(self.get_id(g) + self.get_id(t))]
+                M[g] += self.leters_probability[t] * occurrences[self.get_leter(self.get_id(t) + self.get_id(g))]
             
-        return max(M, key=lambda key: occurrences[key])
+        return max(M, key=lambda key: M[key])
 
     def decipher_by_M_func(self, text: str) -> str:
         key = ""
@@ -224,50 +233,57 @@ class WienerCryptographer:
 
         return key
 
-
-leters_probapility = {
-    "а": 0.075,
-    "б": 0.017,
-    "в": 0.046,
-    "г": 0.016,
-    "д": 0.030,
-    "е": 0.087,
-    "ж": 0.009,
-    "з": 0.018,
-    "и": 0.075,
-    "й": 0.012,
-    "к": 0.034,
-    "л": 0.042,
-    "м": 0.031,
-    "н": 0.065,
-    "о": 0.11,
-    "п": 0.028,
-    "р": 0.048,
-    "с": 0.055,
-    "т": 0.065,
-    "у": 0.025,
-    "ф": 0.002,
-    "х": 0.011,
-    "ц": 0.005,
-    "ч": 0.015,
-    "ш": 0.007,
-    "щ": 0.004,
-    "ъ": 0.017,
-    "ы": 0.019,
-    "ь": 0.017,
-    "э": 0.003,
-    "ю": 0.022,
-    "я": 0.022,
+leters_probability = {
+    "а": 0.0801,
+    "б": 0.0159,
+    "в": 0.0454,
+    "г": 0.0170,
+    "д": 0.0298,
+    "е": 0.0845,
+    "ж": 0.0094,
+    "з": 0.0165,
+    "и": 0.0735,
+    "й": 0.0121,
+    "к": 0.0349,
+    "л": 0.0440,
+    "м": 0.0321,
+    "н": 0.0670,
+    "о": 0.1097,
+    "п": 0.0281,
+    "р": 0.0473,
+    "с": 0.0547,
+    "т": 0.0626,
+    "у": 0.0262,
+    "ф": 0.0026,
+    "х": 0.0097,
+    "ц": 0.0048,
+    "ч": 0.0144,
+    "ш": 0.0073,
+    "щ": 0.0036,
+    "ъ": 0.0004,
+    "ы": 0.0190,
+    "ь": 0.0174,
+    "э": 0.0032,
+    "ю": 0.0064,
+    "я": 0.0201,
 }
 ru_alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 def main():
     John = WienerCryptographer(alpha=ru_alpha,
-                               leters_probapility=leters_probapility)
+                               leters_probability=leters_probability)
 
-    with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
-        text = file.read()
+    # with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
+    with open("cp_2/volynets_fi-03_cp2/forth_variant_cipher_text.txt", "r") as file:
+        text_lines = file.read().splitlines()
+        text = ""
+        for line in text_lines:
+            text += line
         
-        cipher = John.cipher(key="абвабвабва", text=text)
+        # cipher = John.cipher(key="аб", text=text)
+        cipher = text
+
+        key_size = John.calculate_key_size(text=cipher)
+        print(key_size)
 
         un_key = John.decipher_by_letter(text=cipher)
         deciper = John.uncipher(key=un_key, text=cipher)
@@ -281,3 +297,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# громыкавьдума
+# громыковедьма
+
