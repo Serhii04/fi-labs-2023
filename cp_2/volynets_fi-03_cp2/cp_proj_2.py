@@ -1,4 +1,3 @@
-import math
 from pprint import pprint
 
 def create_text(sourse: str, dest: str) -> None:
@@ -175,18 +174,13 @@ class WienerCryptographer:
             for accordance in accordances:
                 avarage_accordance += accordance
             avarage_accordance = avarage_accordance / len(accordances)
-            # pprint(avarage_accordance)
 
-            # pprint(f"{r}: {accordances} - {diff}")
             size_is_r = True
             if avarage_accordance < diff:
                 size_is_r = False
-            
-            # for accordance in accordances:
-            #     if accordance < diff:
-            #         size_is_r = False
-            #         break
-            
+
+            print(f"avarage accordance for {r}: {avarage_accordance}")
+
             if size_is_r:
                 return r
         
@@ -225,7 +219,7 @@ class WienerCryptographer:
         key = ""
 
         r = self.calculate_key_size(text=text)
-        print(f"r: {r}")
+        # print(f"r: {r}")
         
         blocks = self.divide_text(text=text, r=r)
         for block in blocks:
@@ -272,32 +266,59 @@ def main():
     John = WienerCryptographer(alpha=ru_alpha,
                                leters_probability=leters_probability)
 
-    # with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
+    with open("cp_2/volynets_fi-03_cp2/example_text.txt", "r") as file:
+        text = file.read()
+        keys = [
+            "аб",
+            "вгд",
+            "бвгд",
+            "жзийк",
+            "абвфтмглжсщлгдежзийк",
+        ]
+
+
+        for key in keys:
+            cipher = John.cipher(key=key, text=text)
+            I_cipher = John.accordance_index(text=cipher)
+            print(f"Key = \"{key}\"")
+            pprint(cipher)
+            print("")
+
+        
+        I = John.accordance_index(text=text)
+        print(f"- Accordance index of text is: {I:0.4f}")
+        
+        for key in keys:
+            cipher = John.cipher(key=key, text=text)
+            I_cipher = John.accordance_index(text=cipher)
+            print(f"- Accordance index of cipher with key size: {len(key)}, is: {I_cipher:0.4f}", end="\n")
+
     with open("cp_2/volynets_fi-03_cp2/forth_variant_cipher_text.txt", "r") as file:
         text_lines = file.read().splitlines()
         text = ""
         for line in text_lines:
             text += line
         
-        # cipher = John.cipher(key="аб", text=text)
         cipher = text
 
         key_size = John.calculate_key_size(text=cipher)
         print(key_size)
 
+        print("")
+
         un_key = John.decipher_by_letter(text=cipher)
         deciper = John.uncipher(key=un_key, text=cipher)
-        print(f"un_key 1: {un_key}")
+        print(f"un key 1: {un_key}")
         print(f"deciper 1: {deciper}")
+
+        print("")
 
         un_key = John.decipher_by_M_func(text=cipher)
         deciper = John.uncipher(key=un_key, text=cipher)
-        print(f"un_key 2: {un_key}")
+        print(f"un key 2: {un_key}")
         print(f"deciper 2: {deciper}")
 
 if __name__ == "__main__":
     main()
 
-# громыкавьдума
-# громыковедьма
 
