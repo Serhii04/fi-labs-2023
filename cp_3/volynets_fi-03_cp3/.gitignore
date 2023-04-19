@@ -132,3 +132,6 @@ dmypy.json
 table1.txt
 table2.txt
 temp_text.txt
+
+# small tests
+tests
