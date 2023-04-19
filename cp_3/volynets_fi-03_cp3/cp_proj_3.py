@@ -26,27 +26,27 @@ def gcd(a: int, b: int) -> int:
     r_1, r_2 = max(a, b), min(a, b)
 
     r_3 = r_1 % r_2
-    print(f"r_3 = {r_3}")
+    # print(f"r_3 = {r_3}")
     r_1 = r_2
     r_2 = r_3
 
     while r_3 != 0:
         r_3 = r_1 % r_2
-        print(f"r_3 = {r_3}")
+        # print(f"r_3 = {r_3}")
         r_1 = r_2
         r_2 = r_3
     
     return r_1
 
-def reverse(a: int, mod: int) -> int:
-    if not isinstance(a, int) or not isinstance(mod, int):
+def reverse(a: int, M: int) -> int:
+    if not isinstance(a, int) or not isinstance(M, int):
         raise ValueError("Error: only integer values are allowed")
     
     while a < 0:
-        a += mod
+        a += M
 
-    if a >= mod:
-        a = a % mod
+    if a >= M:
+        a = a % M
 
     if a == 0:
         return
@@ -55,7 +55,7 @@ def reverse(a: int, mod: int) -> int:
         return 1
 
     q_vals = []
-    r_1 = mod
+    r_1 = M
     r_2 = a
     r_3 = 1
     while r_3 != 0:
@@ -76,13 +76,34 @@ def reverse(a: int, mod: int) -> int:
         u_vals.append(u_vals[-2] - u_vals[-1] * q)
         v_vals.append(v_vals[-2] - v_vals[-1] * q)
     
-    print(f"q_vals: {q_vals}")
-    print(f"u_vals: {u_vals}")
-    print(f"v_vals: {v_vals}")
+    # print(f"q_vals: {q_vals}")
+    # print(f"u_vals: {u_vals}")
+    # print(f"v_vals: {v_vals}")
     
-    return abs(v_vals[-1])
+    if v_vals[-1] >= 0:
+        return v_vals[-1]
+    
+    return v_vals[-1] + M
 
+def solve_dif_system(a_1: int, mod_1: int, a_2: int, mod_2: int) -> int:
+    d = gcd(mod_1, mod_2)
 
+    if d != 1:
+        return
+
+    N = mod_1 * mod_2
+
+    N_1 = mod_2
+    N_2 = mod_1
+
+    M_1 = reverse(a=N_1, M=mod_1)
+    M_2 = reverse(a=N_2, M=mod_2)
+
+    print(f"answ = ({a_1} * {N_1} * {M_1} + {a_2} * {N_2} * {M_2}) % {N}")
+
+    X_0 = (a_1 * N_1 * M_1 + a_2 * N_2 * M_2) % N
+
+    return X_0
 
 
 class AffineCryptographer:
@@ -104,9 +125,30 @@ class AffineCryptographer:
         for id, leter in zip(range(len(alphabet)), alphabet):
             self.__letter_to_id[leter] = id
 
+    def get_id(self, leter: str):
+        """
+        Retruns:
+            int: index of leter in alphabet, starting from 0
+        """
+        return self.__letter_to_id[leter]
+
+    def get_leter(self, leter_id: int):
+        """
+        Retruns:
+            str: char in alphabet at given index
+        """
+        while leter_id >= self.size:
+            leter_id -= self.size
+        
+        while leter_id < 0:
+            leter_id += self.size
+
+        return self.__id_to_letter[leter_id]
+
+
 
 def main():
-    print(reverse(123, 3452))
+    print(reverse(2, 13))
 
 if __name__ == "__main__":
     main()
