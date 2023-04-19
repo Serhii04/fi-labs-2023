@@ -4,7 +4,7 @@ from lab_constants import __RU_ALPHABET_LETERS_PROBABILITY__ as probability
 from lab_constants import __RU_ALPHABET__ as alphabet
 
 
-def gcd(a: int, b: int):
+def gcd(a: int, b: int) -> int:
     if not isinstance(a, int) or not isinstance(b, int):
         raise ValueError("Error: only integer values are allowed")
     
@@ -38,7 +38,7 @@ def gcd(a: int, b: int):
     
     return r_1
 
-def reverse(a: int, mod: int):
+def reverse(a: int, mod: int) -> int:
     if not isinstance(a, int) or not isinstance(mod, int):
         raise ValueError("Error: only integer values are allowed")
     
@@ -81,6 +81,8 @@ def reverse(a: int, mod: int):
     print(f"v_vals: {v_vals}")
     
     return abs(v_vals[-1])
+
+
 
 
 class AffineCryptographer:
