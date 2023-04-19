@@ -133,5 +133,6 @@ table1.txt
 table2.txt
 temp_text.txt
 
-# small tests
-tests
+# small tests for project
+test_proj.py
+
