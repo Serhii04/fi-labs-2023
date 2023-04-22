@@ -110,7 +110,7 @@ def solve_dif_system(a_1: int, mod_1: int, a_2: int, mod_2: int) -> int:
 def count_bi_gram(text: str) -> dict: 
     bi_gram_counter = dict()
 
-    for key in itertools.product(alphabet, repeat=2):
+    for key in itertools.product(constants.__RU_ALPHABET__, repeat=2):
         s_key = key[0] + key[1]
         reps = text.count(s_key)
         if reps != 0:
