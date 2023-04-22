@@ -1,7 +1,12 @@
 from pprint import pprint
+import itertools
+import heapq
+from operator import itemgetter
 
 from lab_constants import __RU_ALPHABET_LETERS_PROBABILITY__ as probability
 from lab_constants import __RU_ALPHABET__ as alphabet
+from lab_constants import __VARIANT_TEXT__ as var_text
+from lab_constants import __FOR_TEST__ as for_test
 
 
 def gcd(a: int, b: int) -> int:
@@ -105,6 +110,16 @@ def solve_dif_system(a_1: int, mod_1: int, a_2: int, mod_2: int) -> int:
 
     return X_0
 
+def count_bi_gram(text: str) -> dict: 
+    bi_gram_counter = dict()
+
+    for key in itertools.product(alphabet, repeat=2):
+        s_key = key[0] + key[1]
+        reps = text.count(s_key)
+        if reps != 0:
+            bi_gram_counter[s_key] = reps
+
+    return bi_gram_counter
 
 class AffineCryptographer:
     def __init__(self, alphabet: str, leters_probability: list) -> None:
@@ -145,10 +160,41 @@ class AffineCryptographer:
 
         return self.__id_to_letter[leter_id]
 
+    def encrypt(self, open_text: str, key: list) -> str:
+        encrypted_text = ""
+        for c in open_text:
+            encrypted_text += self.get_leter(leter_id=(key[0] * self.get_id(c) + key[1]))
+        
+        return encrypted_text
+    
+    def decrypt_with_key(self, encrypted_text: str, key: str) -> str:
+        decrypted_text = ""
+        for c in encrypted_text:
+            id = reverse(a=key[0], M=self.size) * (self.get_id(c) - key[1])
+            decrypted_text += self.get_leter(leter_id=id)
+        
+        return decrypted_text
 
+def find_the_most_frequent_bi_gramm(text: str, n: int=5):
+    bi_gram = count_bi_gram(text=text)
+    max_four = dict(heapq.nlargest(n=n, iterable=bi_gram.items(), key=itemgetter(1)))
+
+    return max_four
 
 def main():
-    print(reverse(2, 13))
+    # print(find_the_most_frequent_bi_gramm(text=var_text))
+    # print(find_the_most_frequent_bi_gramm(text=for_test))
+
+    John = AffineCryptographer(leters_probability=probability, alphabet=alphabet)
+
+    text = "аабааб"
+    print(f"text: {text}")
+    encrypted_text = John.encrypt(open_text=text, key=(2, 2))
+    print(f"encrypted_text: {encrypted_text}")
+    decrypted_text = John.decrypt_with_key(encrypted_text=encrypted_text, key=(2, 2))
+    print(f"decrypted_text: {decrypted_text}")
+
+
 
 if __name__ == "__main__":
     main()
