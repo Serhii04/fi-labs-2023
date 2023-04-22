@@ -144,11 +144,11 @@ class AffineCryptographer:
         """
         return self.__letter_to_id[leter]
 
-    def get_bi_gramm_id(self, bi_gram: str):
+    def get_id_bi(self, bi_gram: str):
         return self.__letter_to_id[bi_gram[0]] * self.size + self.__letter_to_id[bi_gram[1]]
 
-    def get_bi_gramm_by_id(self, id: int):
-        return int(id / self.size), id % self.size
+    def get_leter_bi(self, id: int):
+        return self.get_leter(int(id / self.size)) + self.get_leter(id % self.size)
 
     def get_leter(self, leter_id: int):
         """
@@ -177,6 +177,40 @@ class AffineCryptographer:
             decrypted_text += self.get_leter(leter_id=id)
         
         return decrypted_text
+    
+    def get_bi_text(self, text: str) -> list:
+        bi_text = []
+
+        for i in range(0, len(text), 2):
+            bigr = text[i] + text[i+1]
+            bi_text.append(bigr)
+        
+        return bi_text
+    
+    def encrypt_bi(self, open_text: str, key: list) -> str:
+        encrypted_text = ""
+        if len(open_text) % 2 == 1:
+            raise ValueError("Error: problem with open text size")
+        
+        bi_text = self.get_bi_text(text=open_text)
+
+        # encryption
+        for bigr in bi_text:
+            encrypted_id = self.get_id_bi(bigr) * key[0] + key[1]
+            encrypted_text += self.get_leter_bi(encrypted_id)
+        
+        return encrypted_text
+    
+    def decrypt_with_key_bi(self, encrypted_text: str, key: str) -> str:
+        decrypted_text = ""
+
+        bi_text = self.get_bi_text(text=encrypted_text)
+
+        for bigr in bi_text:
+            decrypted_id = reverse(a=key[0], M=self.size * self.size) * (self.get_id_bi(bigr) - key[1])
+            decrypted_text += self.get_leter_bi(id=decrypted_id)
+        
+        return decrypted_text
 
 def find_the_most_frequent_bi_gramm(text: str, n: int=5):
     bi_gram = count_bi_gram(text=text)
@@ -191,12 +225,12 @@ def main():
     John = AffineCryptographer(leters_probability=constants.__RU_ALPHABET_LETERS_PROBABILITY__,
                                alphabet=constants.__RU_ALPHABET__)
 
-    text = "аабааб"
-    # print(f"text: {text}")
-    # encrypted_text = John.encrypt(open_text=text, key=(2, 2))
-    # print(f"encrypted_text: {encrypted_text}")
-    # decrypted_text = John.decrypt_with_key(encrypted_text=encrypted_text, key=(2, 2))
-    # print(f"decrypted_text: {decrypted_text}")
+    text = "аабаабущмшчш"
+    print(f"text: {text}")
+    encrypted_text = John.encrypt_bi(open_text=text, key=(2, 2))
+    print(f"encrypted_text: {encrypted_text}")
+    decrypted_text = John.decrypt_with_key_bi(encrypted_text=encrypted_text, key=(2, 2))
+    print(f"decrypted_text: {decrypted_text}")
 
 if __name__ == "__main__":
     main()
