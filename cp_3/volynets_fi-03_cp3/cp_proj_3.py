@@ -180,6 +180,9 @@ class AffineCryptographer:
         return decrypted_text
     
     def get_bi_text(self, text: str) -> list:
+        if len(text) % 2 == 1:
+            raise ValueError(f"Error with text size that must be even but {len(text)} was gieven")
+        
         bi_text = []
 
         for i in range(0, len(text), 2):
@@ -283,32 +286,91 @@ class AffineCryptographer:
         I = self.accordance_index(text=text)
         I_def = 0.0591
 
-        if abs(I - I_def) < 1:
+        if abs(I - I_def) < 0.01:
             return True
         
         return False
+    
+    def check_key(self, encrypted_text, key):
+        decrypted_text = ""
+        try:
+            decrypted_text = self.decrypt_with_key_bi(encrypted_text=encrypted_text, key=key)
+        except ValueError as e:
+            return False
+        
+        if self.check_if_is_meaningful(text=decrypted_text):
+            print(f"text: {decrypted_text}")
+            print(f"key: {key}")
+            
+            return True
 
-def find_the_most_frequent_bi_gramm(text: str, n: int=5):
-    bi_gram = count_bi_gram(text=text)
-    max_four = dict(heapq.nlargest(n=n, iterable=bi_gram.items(), key=itemgetter(1)))
+        return False
+    
+    def decrypt_bi(self, encrypted_text: str) -> str:
+        mf = self.find_the_most_frequent_bi_gramm(text=encrypted_text, n=5)
+        mf_def = ["ст", "но", "то", "на", "ен"]
 
-    return max_four
+        print("In progress...")
+        for p1 in itertools.permutations([0, 1, 2, 3, 4], 2):
+            # print(f"p1: {p1}")
+            print(f"Still in progress...")
+            for p2 in itertools.permutations([0, 1, 2, 3, 4], 2):
+                # print(f"p2: {p2}")
+                keys = self.get_key(decrypted_bi_1=mf_def[p1[0]],
+                                   decrypted_bi_2=mf_def[p1[1]],
+                                   encrypted_bi_1=mf[p2[0]],
+                                   encrypted_bi_2=mf[p2[1]])
+                
+                for key in keys:
+                    if self.check_key(encrypted_text=encrypted_text, key=key):
+                        # return
+                        pass
+                    
+
+    def find_the_most_frequent_bi_gramm(self, text: str, n: int=5) -> dict:
+        bi_gram = count_bi_gram(text=text)
+        max_four = dict(heapq.nlargest(n=n, iterable=bi_gram.items(), key=itemgetter(1)))
+
+        return list(max_four.keys())
+
+def prepare_text(text: str) -> str:
+    final_text = ""
+    
+    for c in text:
+        if c.lower() in constants.__RU_ALPHABET__:
+            final_text += c.lower()
+    
+    return final_text
 
 def main():
     # print(find_the_most_frequent_bi_gramm(text=constants.__VARIANT_TEXT__))
+    # {'еш': 68, 'шя': 52, 'еы': 50, 'до': 49, 'зо': 48}
     # print(find_the_most_frequent_bi_gramm(text=constants.__FOR_TEST__))
+    # {'щь': 119, 'ьв': 92, 'ез': 88, 'ди': 80, 'ий': 75}
 
     John = AffineCryptographer(leters_probability=constants.__RU_ALPHABET_LETERS_PROBABILITY__,
                                alphabet=constants.__RU_ALPHABET__)
 
-    text = "аубаабущмшчш"
-    print(f"text: {text}")
-    encrypted_text = John.encrypt_bi(open_text=text, key=(2, 2))
-    print(f"encrypted_text: {encrypted_text}")
-    decrypted_text = John.decrypt_with_key_bi(encrypted_text=encrypted_text, key=(2, 2))
-    print(f"decrypted_text: {decrypted_text}")
+    text = """Автомобиль, без преувеличения, можно назвать самым популярным транспортным средством на нашей планете. Он есть практически в каждом доме, а некоторые семьи имеют даже несколько машин.
+    Безусловно, автомобили во многом упрощают жизнь человека. С их помощью можно легко и быстро добраться из одной точки города в другую, а также перевезти тяжёлые вещи. Машина — это отличное средство для путешествий в пределах родной страны или заграницу.
+    Но к сожалению, с большой распространённостью автомобилей в мире связано множество экологических проблем. Главная из них — это загрязнение воздуха выхлопными газами. Оно вредит здоровью людей и приводит к ухудшению состояния атмосферы.
+    Последнее влечёт за собой явление под названием парниковый эффект. Выхлопные газы, скапливаясь в атмосфере, препятствуют отдаче тепла земли в космос. В результате воздух над поверхностью нашей планеты сильно нагревается, что приводит ещё к целому ряду осложнений, таких как повышение уровня мирового океана, глобальное таяние ледников, нарушение климата и так далее.
+    Одним словом, цена, которую люди платят за использование автомобилей, несмотря на всё их удобство, довольно высока. Поэтому я не могу назвать эти транспортные средства исключительно друзьями человека.
+    Машины действительно сильно вредят людям, поэтому в будущем, если мы хотим продолжить пользоваться ими, ситуация должна измениться. Уже сейчас начался активный поиск альтернативных источников энергии, способных заменить собой бензиновые двигатели.
+    В связи с этим успешно были введены в эксплуатацию электромобили. Надеюсь, в будущем транспорт также сможет стать не только безвредным, но и совершенно бесшумным. Лишь тогда люди смогут массово передвигаться на автомобилях без вреда для своего здоровья и для планет."""
 
-    print(John.get_key(encrypted_bi_1="бй", encrypted_bi_2="вв", decrypted_bi_1="ау", decrypted_bi_2="ба"))
+    text = prepare_text(text)
+    # print(f"text: {text}")
+    # print(">><><>><><><><><><><<<><><><")
+    
+    encrypted_text = John.encrypt_bi(open_text=text, key=(7, 7))
+    # print(f"encrypted_text: {encrypted_text}")
+    
+    # encrypted_text = constants.__FOR_TEST__
+    encrypted_text = constants.__VARIANT_TEXT__
+    decrypted_text = John.decrypt_bi(encrypted_text=encrypted_text)
+    # print(f"decrypted_text: {decrypted_text}")
+
 
 if __name__ == "__main__":
     main()
