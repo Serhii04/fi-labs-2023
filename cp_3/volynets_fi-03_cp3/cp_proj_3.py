@@ -1,4 +1,5 @@
 from pprint import pprint
+import math
 import itertools
 import heapq
 from operator import itemgetter
@@ -215,19 +216,77 @@ class AffineCryptographer:
     def get_key(self, encrypted_bi_1, encrypted_bi_2, decrypted_bi_1, decrypted_bi_2):
         mod = pow(self.size, 2)
 
-        x_1 = self.get_id_bi(encrypted_bi_1)
-        x_2 = self.get_id_bi(encrypted_bi_2)
-        y_1 = self.get_id_bi(decrypted_bi_1)
-        y_2 = self.get_id_bi(decrypted_bi_2)
+        x_1 = self.get_id_bi(decrypted_bi_1)
+        x_2 = self.get_id_bi(decrypted_bi_2)
+        y_1 = self.get_id_bi(encrypted_bi_1)
+        y_2 = self.get_id_bi(encrypted_bi_2)
 
-        print(f"x_1 - x_2 = {x_1 - x_2}")
-        r = reverse(a=(x_1 - x_2), M=mod)
-        print(r)
-        a = ((y_1 - y_2) * r) % mod
+        # y = ax mod 
+        x = x_1 - x_2
+        y = y_1 - y_2
+        
+        if x < 0:
+            x += mod
 
+        d = gcd(a=x, b=mod)
+
+        if d == 1:
+            r = reverse(a=x, M=mod)
+            a = (y * r) % mod
+            b = (y_1 - a * x_1) % mod
+        
+            return [(a, b)] # the only solution
+        
+        if y % d != 0:
+            return []  # no solution
+        
+        x = int(x / d)
+        y = int(y / d)
+        mod = int(mod / d)
+
+        r = reverse(a=x, M=mod)
+        a = (y * r) % mod
         b = (y_1 - a * x_1) % mod
 
-        return a, b
+        rez = []
+
+        for i in range(d):
+            rez.append((a, b))
+            a += mod
+            b += mod
+        
+        return rez
+
+    def count_occurrences(self, text: str) -> dict:
+        occurrences = dict()
+        for c in self.alphabet:
+            occurrences[c] = 0
+
+        for c in text:
+            occurrences[c] += 1
+        
+        return occurrences
+
+    def accordance_index(self, text: str) -> float:
+        index = 0
+
+        occurrences = self.count_occurrences(text=text)
+        for key in occurrences:
+            index += occurrences[key] * (occurrences[key] - 1)
+
+        n = len(text)
+        index = (index / n) / (n-1)
+
+        return index
+
+    def check_if_is_meaningful(self, text) -> bool:
+        I = self.accordance_index(text=text)
+        I_def = 0.0591
+
+        if abs(I - I_def) < 1:
+            return True
+        
+        return False
 
 def find_the_most_frequent_bi_gramm(text: str, n: int=5):
     bi_gram = count_bi_gram(text=text)
@@ -242,14 +301,14 @@ def main():
     John = AffineCryptographer(leters_probability=constants.__RU_ALPHABET_LETERS_PROBABILITY__,
                                alphabet=constants.__RU_ALPHABET__)
 
-    text = "акбаабущмшчш"
+    text = "аубаабущмшчш"
     print(f"text: {text}")
-    encrypted_text = John.encrypt_bi(open_text=text, key=(3, 3))
+    encrypted_text = John.encrypt_bi(open_text=text, key=(2, 2))
     print(f"encrypted_text: {encrypted_text}")
-    decrypted_text = John.decrypt_with_key_bi(encrypted_text=encrypted_text, key=(3, 3))
+    decrypted_text = John.decrypt_with_key_bi(encrypted_text=encrypted_text, key=(2, 2))
     print(f"decrypted_text: {decrypted_text}")
 
-    print(John.get_key(encrypted_bi_1="ак", encrypted_bi_2="ба", decrypted_bi_1="бв", decrypted_bi_2="гг"))
+    print(John.get_key(encrypted_bi_1="бй", encrypted_bi_2="вв", decrypted_bi_1="ау", decrypted_bi_2="ба"))
 
 if __name__ == "__main__":
     main()
