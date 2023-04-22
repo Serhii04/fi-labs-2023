@@ -51,7 +51,7 @@ def reverse(a: int, M: int) -> int:
         a = a % M
 
     if a == 0:
-        return
+        raise ValueError("Error: zero has no reverse element")
 
     if a == 1:
         return 1
@@ -68,7 +68,7 @@ def reverse(a: int, M: int) -> int:
         r_2 = r_3
     
     if r_1 != 1:
-        return 
+        raise ValueError(f"Error: number must have no comon divisors with module while have: {r_1}")
     
     q_vals.pop()
     
@@ -211,6 +211,23 @@ class AffineCryptographer:
             decrypted_text += self.get_leter_bi(id=decrypted_id)
         
         return decrypted_text
+    
+    def get_key(self, encrypted_bi_1, encrypted_bi_2, decrypted_bi_1, decrypted_bi_2):
+        mod = pow(self.size, 2)
+
+        x_1 = self.get_id_bi(encrypted_bi_1)
+        x_2 = self.get_id_bi(encrypted_bi_2)
+        y_1 = self.get_id_bi(decrypted_bi_1)
+        y_2 = self.get_id_bi(decrypted_bi_2)
+
+        print(f"x_1 - x_2 = {x_1 - x_2}")
+        r = reverse(a=(x_1 - x_2), M=mod)
+        print(r)
+        a = ((y_1 - y_2) * r) % mod
+
+        b = (y_1 - a * x_1) % mod
+
+        return a, b
 
 def find_the_most_frequent_bi_gramm(text: str, n: int=5):
     bi_gram = count_bi_gram(text=text)
@@ -225,12 +242,14 @@ def main():
     John = AffineCryptographer(leters_probability=constants.__RU_ALPHABET_LETERS_PROBABILITY__,
                                alphabet=constants.__RU_ALPHABET__)
 
-    text = "аабаабущмшчш"
+    text = "акбаабущмшчш"
     print(f"text: {text}")
-    encrypted_text = John.encrypt_bi(open_text=text, key=(2, 2))
+    encrypted_text = John.encrypt_bi(open_text=text, key=(3, 3))
     print(f"encrypted_text: {encrypted_text}")
-    decrypted_text = John.decrypt_with_key_bi(encrypted_text=encrypted_text, key=(2, 2))
+    decrypted_text = John.decrypt_with_key_bi(encrypted_text=encrypted_text, key=(3, 3))
     print(f"decrypted_text: {decrypted_text}")
+
+    print(John.get_key(encrypted_bi_1="ак", encrypted_bi_2="ба", decrypted_bi_1="бв", decrypted_bi_2="гг"))
 
 if __name__ == "__main__":
     main()
