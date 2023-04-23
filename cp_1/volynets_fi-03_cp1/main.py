@@ -68,10 +68,10 @@ def calculate_H(n_gram_counter: dict):
 
     return H
 
-def create_text():
+def create_text(src: str):
     """Convert file temp_text.txt to apropriate for me wiev and save it in rand_text.txt
     """
-    file_text = get_text("cp_1/volynets_fi-03_cp1/temp_text.txt")
+    file_text = get_text(src)
 
     ban = [",",
            ".",
@@ -92,8 +92,10 @@ def create_text():
            "-",
            ]
     with open("cp_1/volynets_fi-03_cp1/rand_text.txt", "w") as file:
-        for c in file_text:
-            if c.isalpha():
+        alphabet = "щцкяхмбавинлйшдыфъжспучэьтгорюзе "
+
+        for c in file_text.lower():
+            if c in alphabet:
                 file.write(c.lower())
 
 def get_text(src: str):
@@ -118,23 +120,168 @@ def write_n_gram_letter_counter(n_gram_letter_counter, n):
                 cnt += 1
         table_file.write(" \\\\\n\\end{longtable}\n")
 
-def main():
-        text = get_text("cp_1/volynets_fi-03_cp1/rand_text.txt")
+def with_space(word: str) -> str:
+    rez = ""
     
-        alphabet = "щцкяхмбавинлйшдыфъжспучэьтгорюзе"
+    for c in word:
+        if c == " ":
+            rez += "\_"
+        else:
+            rez += c
+    
+    return rez
 
-        # Here i is a size of leters: 1 is leter, 2 is bigram, and other
-        # should be in range(1, 3). In other way it will work forewer (wery long)
-        for i in range(1, 3):
-            n_gram_counter, n_gram_letter_counter = count_n_gram_apearance(n=i, text=text, alphabet=alphabet)
+def print_dict_latex(d: dict) -> None:
+    r = 0
+    max_r = 6
 
-            
-            # # Next line creates files for longtable in latex
-            # n_gram_letter_counter = sorted(n_gram_letter_counter.items(), key=lambda x: x[1])
-            # write_n_gram_letter_counter(n_gram_letter_counter, n=i)            
+    print("\\begin{longtable}{", end="")
+    
+    for i in range(max_r):
+        print("rl", end="")
+    
+    print("}")
+    
+    for key in d:
+        if float(d[key]) == 0.0:
+            continue
 
-            print(f"Max(H): {math.log2(pow(len(alphabet), i))}")
-            print(f"H = {calculate_H(n_gram_counter)}\n")
+        if r == 0:
+            print("    ", end="")
+
+        print(f"{with_space(key)}: & {d[key]}", end="")
+        
+        if r == max_r - 1:
+            print(" \\\\")
+        else:
+            print(" & ", end="")
+        
+        r += 1
+        if r == max_r:
+            r = 0
+    
+    r += 1
+    while r < max_r:
+        print(" & &", end="")
+        r += 1
+
+    if r == max_r:
+        print(" & \\\\")
+
+    print("\end{longtable}")
+
+def one_gram():
+    text = get_text("cp_1/volynets_fi-03_cp1/rand_text.txt")
+    # text = create_text("cp_1/volynets_fi-03_cp1/text_for_jdksfjlsdf.txt")
+    
+    alphabet = "щцкяхмбавинлйшдыфъжспучэьтгорюзе"
+
+    prepared_text = ""
+    for c in text.lower():
+        if c in alphabet:
+            prepared_text += c
+    
+    counter = collections.defaultdict(int)
+
+    size = len(prepared_text)
+
+    # for key in itertools.product(alphabet, repeat=1):
+    for c in alphabet:
+        reps = prepared_text.count(c)
+        counter[c] = f"{reps / size:0.3f}"
+
+    print_dict_latex(counter)
+
+    sum = 0
+    for key in counter:
+        sum += float(counter[key])
+    
+    print(f"sum = {sum}")
+
+def bi_gram_with_colisions():
+    text = get_text("cp_1/volynets_fi-03_cp1/rand_text.txt")
+    
+    alphabet = "щцкяхмбавинлйшдыфъжспучэьтгорюзе"
+
+    prepared_text = ""
+    for c in text.lower():
+        if c in alphabet:
+            prepared_text += c
+    
+    counter = collections.defaultdict(int)
+
+    size = len(prepared_text)
+
+    for key in itertools.product(alphabet, repeat=2):
+        s_key = concat_tuple(key)
+        reps = prepared_text.count(s_key)
+        if reps != 0:
+            counter[s_key] = f"{reps / size:0.3f}"
+
+    print_dict_latex(counter)
+
+    sum = 0
+    for key in counter:
+        sum += float(counter[key])
+    
+    print(f"sum = {sum}")
+
+def div_bi(text: str) -> list:
+    rez = []
+
+    for i in range(0, len(text), 2):
+        rez.append(text[i] + text[i+1])
+    
+    return rez
+
+def bi_gram_no_colisions():
+    text = get_text("cp_1/volynets_fi-03_cp1/rand_text.txt")
+    
+    alphabet = "щцкяхмбавинлйшдыфъжспучэьтгорюзе"
+
+    prepared_text = ""
+    for c in text.lower():
+        if c in alphabet:
+            prepared_text += c
+    
+    counter = collections.defaultdict(int)
+
+    size = len(prepared_text)
+
+    prepared_text = div_bi(prepared_text)
+
+    for key in itertools.product(alphabet, repeat=2):
+        s_key = concat_tuple(key)
+        reps = text.count(s_key)
+        if reps != 0:
+            counter[s_key] = f"{reps / size:0.3f}"
+
+    print_dict_latex(counter)
+
+    sum = 0
+    for key in counter:
+        sum += float(counter[key])
+    
+    print(f"sum = {sum}")
+
+def main():
+    # bi_gram_with_colisions()
+    bi_gram_no_colisions()
+    # create_text("cp_1/volynets_fi-03_cp1/text_for_jdksfjlsdf.txt")
+
+
+    # # Here i is a size of leters: 1 is leter, 2 is bigram, and other
+    # # should be in range(1, 3). In other way it will work forewer (wery long)
+    # for i in range(1, 3):
+    #     n_gram_counter, n_gram_letter_counter = count_n_gram_apearance(n=i, text=text, alphabet=alphabet)
+
+        
+    #     # # Next line creates files for longtable in latex
+    #     # n_gram_letter_counter = sorted(n_gram_letter_counter.items(), key=lambda x: x[1])
+    #     # write_n_gram_letter_counter(n_gram_letter_counter, n=i)            
+
+    #     print(f"Max(H): {math.log2(pow(len(alphabet), i))}")
+    #     print(f"H = {calculate_H(n_gram_counter)}\n")
 
     
 
