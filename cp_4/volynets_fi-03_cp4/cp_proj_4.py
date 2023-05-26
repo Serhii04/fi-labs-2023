@@ -31,7 +31,6 @@ class Binary_vector:
         
         return f"[{s}]"
 
-
     def append(self, value) -> None:
         self.state.append(value)
         self._curent_state_id += 1
@@ -68,7 +67,6 @@ def Geffe(state: Binary_vector) -> bool:
     y = L_2(state=state)
     s = L_3(state=state)
     
-    print(x, y, s)
     return s*x ^ (1 ^ s)*y
 
 # ************************************
@@ -81,7 +79,6 @@ def main():
 
     for i in range(20):
         r = Geffe(state=v)
-        print(r)
         v.append(r)
         print(v)
 
