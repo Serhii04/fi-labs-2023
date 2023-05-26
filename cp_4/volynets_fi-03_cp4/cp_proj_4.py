@@ -49,6 +49,12 @@ class BinaryVector:
     def next_state(self) -> None:
         self.state_id += 1
 
+class GeffeCryptographer:
+    def __init__(self):
+        pass
+
+    def get_key_of(self, states: Binary_vector) -> Binary_vector:
+        pass
 
 # ************************************
 #           Generator functions
