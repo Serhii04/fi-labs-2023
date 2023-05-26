@@ -58,6 +58,8 @@ class GeffeCryptographer:
         R = 0
         for i in range(N):
             R += int(state_1[i] ^ state_2[i])
+        
+        return R
 
 
 # ************************************
