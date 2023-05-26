@@ -1,5 +1,6 @@
 import math
 import collections
+import itertools
 
 
 # ************************************
@@ -53,8 +54,11 @@ class GeffeCryptographer:
     def __init__(self):
         pass
 
-    def get_key_of(self, states: BinaryVector) -> BinaryVector:
-        pass
+    def calculate_statistic(self, state_1: BinaryVector, state_2: BinaryVector, N: int) -> int:
+        R = 0
+        for i in range(N):
+            R += int(state_1[i] ^ state_2[i])
+
 
 # ************************************
 #           Generator functions
