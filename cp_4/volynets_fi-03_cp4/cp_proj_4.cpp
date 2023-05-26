@@ -228,42 +228,42 @@ public:
         return candidats;
     }
 
-    vector<vector<bool>> get_candidats_for_L_3(string z_val){
-        vector<bool> *z = get_bool_vector(z_val);
-        vector<vector<bool>> candidats(0);
-        vector<bool> *key_iterator = new vector<bool>(n_2);
-        for(int i = 0; i < n_2; ++i){
-            (*key_iterator)[i] = false;
-        }
-        vector<bool> *temp_x = new vector<bool>(N_2);
+    // vector<vector<bool>> get_candidats_for_L_3(string z_val){
+    //     vector<bool> *z = get_bool_vector(z_val);
+    //     vector<vector<bool>> candidats(0);
+    //     vector<bool> *key_iterator = new vector<bool>(n_2);
+    //     for(int i = 0; i < n_2; ++i){
+    //         (*key_iterator)[i] = false;
+    //     }
+    //     vector<bool> *temp_x = new vector<bool>(N_2);
 
-        while(next_vector(key_iterator)){
-            for(int i = 0; i < n_2; ++i){
-                (*temp_x)[i] = (*key_iterator)[i];
-            }
+    //     while(next_vector(key_iterator)){
+    //         for(int i = 0; i < n_2; ++i){
+    //             (*temp_x)[i] = (*key_iterator)[i];
+    //         }
 
-            for(int i = n_2; i < N_2; ++i){
-                (*temp_x)[i] = L_2(temp_x, i - n_2);
-            }
+    //         for(int i = n_2; i < N_2; ++i){
+    //             (*temp_x)[i] = L_2(temp_x, i - n_2);
+    //         }
 
-            int R = calculate_statistic(z, temp_x, N_2);
+    //         int R = calculate_statistic(z, temp_x, N_2);
 
-            if(R < C_2){
-                vector<bool> for_save(n_2);
+    //         if(R < C_2){
+    //             vector<bool> for_save(n_2);
                 
-                for(int i = 0; i < n_2; ++i){
-                    for_save[i] = key_iterator->at(i);
-                }
+    //             for(int i = 0; i < n_2; ++i){
+    //                 for_save[i] = key_iterator->at(i);
+    //             }
 
-                candidats.push_back(for_save);
-                cout << "There: R = " << R << ", key = ";
-                print_bool_vector(&for_save);
-                // return cur_state
-            }
-        }
+    //             candidats.push_back(for_save);
+    //             cout << "There: R = " << R << ", key = ";
+    //             print_bool_vector(&for_save);
+    //             // return cur_state
+    //         }
+    //     }
 
-        return candidats;
-    }
+    //     return candidats;
+    // }
 };
 
 // ************************************
