@@ -51,10 +51,21 @@ def linear_solve(a, b, n):
 
         
 
-n=486
-a=59
-b=165
+n=22123141241
+a=1056
+b=2612412
+result=linear_solve(a,b,n)
+print(f"{a}x={b}(mod{n})")
+print(result)
 
-print(linear_solve(a,b,n))
+def test_equal(a,b,n,result):
+    for i in result:
 
+        if (a * i) % n ==(b % n):
+            print(f"{a}*{i}={b}mod({n}) \n Успех")
+        else: 
+            return "Не успех"
+
+
+print(test_equal(a,b,n,result))
 
