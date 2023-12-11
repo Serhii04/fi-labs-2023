@@ -151,7 +151,7 @@ def combination_of_bigrams(most_theor_bigram, most_bi ):
     return combinations
 
 
-#знаходження пар (a,b)[ключі]
+#знаходження пар (a,b)
 def find_pairs_ab(combinations, alphabet_size=31**2):
     ab = []
     x1, x2 = ind_bi(combinations[0][0]), ind_bi(combinations[1][0])
