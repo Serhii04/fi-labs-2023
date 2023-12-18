@@ -1,6 +1,5 @@
 from itertools import product
 from scipy.stats import norm
-from sequence import known_sequence
 from multiprocessing import Pool
 
 
